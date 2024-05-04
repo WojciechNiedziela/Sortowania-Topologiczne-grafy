@@ -78,11 +78,15 @@ class Graph:
         tex_file.write("\\end{tikzpicture}\n")
         tex_file.write("\\end{document}\n")
 
-
-
-
 def generate_user_graph():
-    graph_type = input("type> ")
+    valid_types = ["matrix", "list", "table"]
+    graph_type = ""
+
+    while graph_type not in valid_types:
+        graph_type = input("type> ").lower()
+        if graph_type not in valid_types:
+            print("Invalid type. Please enter either 'matrix', 'list', or 'table'.")
+
     nodes = int(input("nodes> "))
     graph = Graph(nodes)
 
@@ -93,23 +97,34 @@ def generate_user_graph():
     return graph_type, graph
 
 def generate_dag(nodes, saturation): # Dag - Directed Acyclic Graph
-    # Tworzymy pustą macierz sąsiedztwa
-    adjacency_matrix = np.zeros((nodes, nodes))
+    graph = Graph(nodes)
 
-    # Wypełniamy górny trójkąt macierzy sąsiedztwa jedynkami
-    for i in range(nodes):
-        for j in range(i+1, min(i+1+int(nodes*saturation), nodes)):
-            adjacency_matrix[i, j] = 1
+    # Dodajemy krawędzie do grafu
+    for i in range(1, nodes+1):
+        edges = []
+        for j in range(i+1, min(i+1+int(nodes*saturation), nodes+1)):
+            edges.append(j)
+        graph.add_edge(i, edges)
 
-    return adjacency_matrix
+    return graph
 
 def load_user_provided_graph():
+    valid_types = ["matrix", "list", "table"]
+    graph_type = ""
+
+    while graph_type not in valid_types:
+        graph_type = input("type> ").lower()
+        if graph_type not in valid_types:
+            print("Invalid type. Please enter either 'matrix', 'list', or 'table'.")
+
     nodes = int(input("Nodes> "))
-    adjacency_list = []
+    graph = Graph(nodes)
+
     for i in range(1, nodes+1):  # Zmieniamy zakres na 1 do nodes+1
         successors = list(map(int, input(f"Podaj następników dla wierzchołka {i}: ").split()))
-        adjacency_list.append(successors)
-    return adjacency_list
+        graph.add_edge(i, successors)
+
+    return graph_type, graph
 
 def main():
     parser = argparse.ArgumentParser()
@@ -120,20 +135,18 @@ def main():
 
     graph = None
     if args.generate:
-        graph_type, graph = generate_user_graph()
-        print(f"Reprezentacja grafu: {graph_type}")
-        print(f"Graf: {graph.graph}")
-    elif args.generate2:
         nodes = int(input("Nodes> "))
         saturation = float(input("Saturation> "))/100
 
-        dag = generate_dag(nodes, saturation)
-        print("Wygenerowana macierz sąsiedztwa DAG:")
-        print(dag)
+        graph = generate_dag(nodes, saturation)  # Przypisujemy wynik do zmiennej 'graph'
+        print("Wygenerowany graf:")
+        print(graph.graph)  # Wyświetlamy graf
+        
     elif args.user_provided:
-        graph = load_user_provided_graph()
+        graph_type, graph = load_user_provided_graph()
+        print(f"Reprezentacja grafu: {graph_type}")
         print("Wczytany graf od użytkownika:")
-        print(graph)
+        print(graph.graph)
 
     while True:
         command = input("> ").lower()
@@ -160,11 +173,11 @@ def main():
             else:
                 print("Brak grafu do wyeksportowania.")
         elif command == "help":
-            print("help -   wyświetla pomoc\n")
-            print("dfs  -   przechodzi graf przy pomocy algorytmu dfs\n")
-            print("tarjan -   przechodzi graf przy pomocy algorytmu tarjana\n")
-            print("export -   eksportuje graf do pliku LaTeX\n")
-            print("exit -   wychodzi z programu\n")
+            print("help     -   wyświetla pomoc")
+            print("dfs      -   przechodzi graf przy pomocy algorytmu dfs")
+            print("tarjan   -   przechodzi graf przy pomocy algorytmu tarjana")
+            print("export   -   eksportuje graf do pliku LaTeX")
+            print("exit     -   wychodzi z programu")
         elif command == "exit":
             break
         else:
