@@ -1,20 +1,21 @@
-import argparse
+import argparse, os, re
 import Graph_class_time as Graph_class_time # type: ignore
 
 Graph = Graph_class_time.Graph
 
+def load_graph_from_file(file_path):
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+        graph_type = lines[0].strip()  # Graph type
+        nodes = int(lines[1].strip())  # Number of nodes
+        graph = Graph(nodes, graph_type)
+        for i in range(2, nodes+2):  # Nodes and their neighbors
+            successors = list(map(int, lines[i].split()))
+            graph.add_edge(i-1, successors)
+        action1 = lines[nodes+2].strip()  # Command 1
+        action2 = lines[nodes+3].strip()  # Command 2
+    return graph, action1, action2
 
-def generate_dag(nodes, saturation): # Dag - Directed Acyclic Graph
-    graph = Graph(nodes, "list")  # We'll use an adjacency list to represent the DAG
-
-    # Add edges to the graph
-    for i in range(1, nodes+1): # For each node
-        edges = []
-        for j in range(i+1, min(i+1+int(nodes*saturation), nodes+1)): # Add edges to the next nodes depending on the saturation
-            edges.append(j) # Add an edge to the next node
-        graph.add_edge(i, edges) # Add the edges to the graph
-
-    return graph
 
 def load_user_provided_graph(): # Load a user-provided graph (ask for data)
 
@@ -35,74 +36,35 @@ def load_user_provided_graph(): # Load a user-provided graph (ask for data)
 
     return graph_type, graph
 
-def display_help(): # Display help
-    print("Available commands:")
-    print("help     -   display help")
-    print("dfs      -   perform Depth-First Search on the graph")
-    print("tarjan   -   perform Tarjan's algorithm on the graph")
-    print("export   -   export the graph to a LaTeX file")
-    print("exit     -   exit the program")
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--generate', action='store_true')
-    parser.add_argument('--generate2', action='store_true')
-    parser.add_argument('--user-provided', action='store_true')
+    parser.add_argument('--data-folder', default='data')
     args = parser.parse_args()
 
-    graph = None
-    if args.generate:
-        nodes = int(input("Nodes> "))
-        saturation = float(input("Saturation> "))/100
+    data_folder = args.data_folder
+    files = os.listdir(data_folder)
+    files = sorted(files, key=lambda f: int(re.search(r'file(\d+)', f).group(1)))
 
-        graph = generate_dag(nodes, saturation)  # Generate a directed acyclic graph (DAG)
-        print("Generated graph:")
-        print(graph.graph)  # Display the graph
-        
-    elif args.user_provided:
-        graph_type, graph = load_user_provided_graph()
-        print(f"Graph representation: {graph_type}")
-        print("User-provided graph:")
+    for filename in files:
+        file_path = os.path.join(data_folder, filename)
+        graph, action1, action2 = load_graph_from_file(file_path)
+        print(f"Loaded graph from {filename}:")
         print(graph.graph)
 
-    while True:
-        command = input("> ").lower()
-        if command == "dfs":
-            if graph is not None:
-                graph.reset_visited()  # Reset visited list before running DFS
-                print("Depth-First Search:")
-                print(graph.dfs_all())
+        if action1 == "tarjan":
+            graph.reset_visited()  # Reset visited list before running Tarjan's algorithm
+            start_node = graph.find_start_node()
+            if start_node is None:
+                print("The graph contains a cycle.")
             else:
-                print("No graph to perform DFS on.")
-        elif command == "tarjan":
-            if graph is not None:
-                graph.reset_visited()  # Reset visited list before running Tarjan's algorithm
-                start_node = graph.find_start_node()
-                if start_node is None:
-                    print("The graph contains a cycle.")
-                else:
-                    graph.tarjan(start_node)  # Run Tarjan's algorithm
-                    graph.sccs.reverse()
-                    print('[', end='')
-                    for scc in graph.sccs:
-                        print(*scc, end="" + ', ' if scc != graph.sccs[-1] else '')
-                    print(']')
-                    
-            else:
-                print("No graph to perform Tarjan's algorithm on.")
-        elif command == "export":
-            if graph is not None:
-                with open("graph.tex", "w") as tex_file:
-                    graph.export(tex_file)
-                print("Graph exported to graph.tex.")
-            else:
-                print("No graph to export.")
-        elif command == "help":
-            display_help()
-        elif command == "exit":
-            break
-        else:
-            print("Unknown command.")
+                graph.tarjan(start_node)  # Run Tarjan's algorithm
+                graph.sccs.reverse()
+                print('[', end='')
+                for scc in graph.sccs:
+                    print(*scc, end="" + ', ' if scc != graph.sccs[-1] else '')
+                print(']')
+        # Add more actions as needed...
 
 if __name__ == "__main__":
     main()

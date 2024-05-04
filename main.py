@@ -46,7 +46,6 @@ def display_help(): # Display help
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--generate', action='store_true')
-    parser.add_argument('--generate2', action='store_true')
     parser.add_argument('--user-provided', action='store_true')
     args = parser.parse_args()
 
@@ -106,3 +105,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
