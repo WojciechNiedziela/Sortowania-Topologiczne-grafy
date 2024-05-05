@@ -9,9 +9,11 @@ def timer_decorator(func):
         result = func(self, node, initial_call=False)
         if initial_call:
             wrapper._total_time = time.time() - wrapper._start_time
-            print(f"Total time taken by {func.__name__}: {wrapper._total_time} seconds")
+            with open('results.txt', 'a') as f:  # Open the file in append mode
+                f.write(f"{wrapper._total_time}\n")  # Write the result to the file
         return result
     return wrapper
+
 
 
 

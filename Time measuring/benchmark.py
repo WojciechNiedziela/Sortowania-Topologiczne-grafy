@@ -9,6 +9,19 @@ def generate_dag_data(n):
         data.append((i, edges))
     return data
 
+# def create_dag_files(start, end, step):
+#     for num_nodes in range(start, end+1, step):
+#         with open(os.path.join('Sortowania-Topologiczne-grafy/Time measuring/data', f'dag_file{num_nodes}.txt'), 'w') as f:
+#             f.write("matrix\n")  # Graph type
+#             f.write(str(num_nodes) + '\n')  # Number of nodes
+#             dag_data = generate_dag_data(num_nodes)  # Generate DAG data
+#             for node, edges in dag_data:
+#                 f.write(str(node) + ' ' + ' '.join(map(str, edges)) + '\n')  # Nodes and their neighbors
+#                 # f.write(' '.join(map(str, edges)) + '\n')  # Nodes and their neighbors
+#             f.write("tarjan\n")  # Last line
+#             f.write("exit\n")  # Last line
+
+
 def create_dag_files(start, end, step):
     for num_nodes in range(start, end+1, step):
         with open(os.path.join('Sortowania-Topologiczne-grafy/Time measuring/data', f'dag_file{num_nodes}.txt'), 'w') as f:
@@ -16,7 +29,7 @@ def create_dag_files(start, end, step):
             f.write(str(num_nodes) + '\n')  # Number of nodes
             dag_data = generate_dag_data(num_nodes)  # Generate DAG data
             for node, edges in dag_data:
-                f.write(str(node) + ' ' + ' '.join(map(str, edges)) + '\n')  # Nodes and their neighbors
+                f.write(' '.join(map(str, edges)) + '\n')  # Nodes and their neighbors
             f.write("tarjan\n")  # Last line
             f.write("exit\n")  # Last line
 
