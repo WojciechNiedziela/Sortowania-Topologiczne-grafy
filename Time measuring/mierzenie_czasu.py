@@ -1,5 +1,7 @@
-import argparse, os, re
+import argparse, os, re, sys
 import Graph_class_time as Graph_class_time # type: ignore
+
+sys.setrecursionlimit(1000000000)
 
 Graph = Graph_class_time.Graph
 
@@ -50,7 +52,7 @@ def main():
         file_path = os.path.join(data_folder, filename)
         graph, action1, action2 = load_graph_from_file(file_path)
         print(f"Loaded graph from {filename}:")
-        print(graph.graph)
+        # print(graph.graph)
 
         if action1 == "tarjan":
             graph.reset_visited()  # Reset visited list before running Tarjan's algorithm
@@ -60,10 +62,10 @@ def main():
             else:
                 graph.tarjan(start_node)  # Run Tarjan's algorithm
                 graph.sccs.reverse()
-                print('[', end='')
-                for scc in graph.sccs:
-                    print(*scc, end="" + ', ' if scc != graph.sccs[-1] else '')
-                print(']')
+                # print('[', end='')
+                # for scc in graph.sccs:
+                #     print(*scc, end="" + ', ' if scc != graph.sccs[-1] else '')
+                # print(']')
         # Add more actions as needed...
 
 if __name__ == "__main__":

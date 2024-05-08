@@ -35,4 +35,4 @@ def create_dag_files(start, end, step):
 
 os.makedirs('Sortowania-Topologiczne-grafy/Time measuring/data', exist_ok=True)
 
-create_dag_files(pow(2, 2), pow(2, 4), 2)
+create_dag_files(100, 2000, 100)
