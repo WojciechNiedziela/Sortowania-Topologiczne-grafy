@@ -5,14 +5,12 @@ Graph = Graph_class.Graph
 
 
 def generate_dag(nodes, saturation): # Dag - Directed Acyclic Graph
-    graph = Graph(nodes, "list")  # We'll use an adjacency list to represent the DAG
+    graph = [[0 for _ in range(nodes)] for _ in range(nodes)]
 
     # Add edges to the graph
-    for i in range(1, nodes+1): # For each node
-        edges = []
-        for j in range(i+1, min(i+1+int(nodes*saturation), nodes+1)): # Add edges to the next nodes depending on the saturation
-            edges.append(j) # Add an edge to the next node
-        graph.add_edge(i, edges) # Add the edges to the graph
+    for i in range(nodes): # For each node
+        for j in range(i+1, min(i+1+int(nodes*saturation), nodes)): # Add edges to the next nodes depending on the saturation
+            graph[i][j] = 1 # Add an edge to the next node
 
     return graph
 
@@ -56,7 +54,8 @@ def main():
 
         graph = generate_dag(nodes, saturation)  # Generate a directed acyclic graph (DAG)
         print("Generated graph:")
-        print(graph.graph)  # Display the graph
+        for row in graph:  # For each row in the graph
+            print(' '.join(map(str, row)))  # Print the row
         
     elif args.user_provided:
         graph_type, graph = load_user_provided_graph()
